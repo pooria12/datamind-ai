@@ -4,11 +4,7 @@ import { DatasetUploader } from "@components/datasets/DatasetUploader";
 import { useToast } from "@hooks/useToast";
 
 export function Upload() {
-  const [selectedFileObj, setSelectedFileObj] = useState<{
-    name: string;
-    size: number;
-    type: string;
-  } | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const {
     dataset,
@@ -23,19 +19,16 @@ export function Upload() {
   const { toast } = useToast();
 
   const handleFileSelect = (file: File) => {
-    setSelectedFileObj({
-      name: file.name,
-      size: file.size,
-      type: file.type,
-    });
+    setSelectedFile(file);
   };
 
-  const handleProcess = (file: File) => {
-    processFile(file);
+  const handleProcess = () => {
+    if (!selectedFile) return;
+    processFile(selectedFile);
   };
 
   const handleRemove = async () => {
-    setSelectedFileObj(null);
+    setSelectedFile(null);
     await clearDataset();
     toast({
       title: "Dataset cleared",
@@ -46,7 +39,7 @@ export function Upload() {
   };
 
   const handleReplace = () => {
-    setSelectedFileObj(null);
+    setSelectedFile(null);
   };
 
   const processingStatus = dataset ? dataset.status : "idle";
@@ -70,13 +63,20 @@ export function Upload() {
       truncated: parsingResult.truncated,
     };
 
+  const selectedFileMeta =
+    selectedFile && {
+      name: selectedFile.name,
+      size: selectedFile.size,
+      type: selectedFile.type,
+    };
+
   return (
     <DatasetUploader
       onFileSelect={handleFileSelect}
       onProcess={handleProcess}
       onRemove={handleRemove}
       onReplace={handleReplace}
-      selectedFile={selectedFileObj}
+      selectedFile={selectedFileMeta}
       processingStatus={processingStatus}
       progress={progress}
       error={error}
