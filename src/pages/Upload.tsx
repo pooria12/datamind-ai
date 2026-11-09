@@ -12,6 +12,7 @@ export function Upload() {
     parsingResult,
     isProcessing,
     error,
+    selectFile,
     processFile,
     clearDataset,
   } = useDataset();
@@ -20,6 +21,7 @@ export function Upload() {
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file);
+    selectFile(file);
   };
 
   const handleProcess = () => {

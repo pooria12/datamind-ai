@@ -167,7 +167,9 @@ export function useDataset(
           parsingWarnings: result.warnings,
         };
 
-        const profile = profileDataset(profileInput, dataset?.id || generateId());
+        const datasetId = dataset?.id || generateId();
+
+        const profile = profileDataset(profileInput, datasetId);
         const qualityReport = generateQualityReport(profile);
 
         setProgress(90);
@@ -176,7 +178,7 @@ export function useDataset(
 
         const updatedDataset: DatasetRecord = {
           ...dataset,
-          id: dataset?.id || generateId(),
+          id: datasetId,
           filename: file.name,
           fileSize: file.size,
           fileType: file.type || "text/csv",
@@ -206,6 +208,7 @@ export function useDataset(
 
         try {
           await datasetRepository.save(stored);
+          await datasetRepository.setActive(updatedDataset.id);
           setProgress(100);
           setStatus(updatedDataset.status);
           addToast({
